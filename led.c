@@ -122,18 +122,18 @@ void Task_2(void) _task_ 2
                 Scintillation_bit = 0;
             } else if (KeyNum == Independent_button_4) { // ¶ÀÁ¢°´¼ü4
                                                          // ¼ÆËã
-//                    answer=ans_calculate(Number);
-//                    for(count=0;count<Length;count++)
-//                    {
-//                        Number[count]=0;
-//                    }
-//                    count=0;
-//                    while (answer)
-//                    {
-//                        Number[count] = answer % 10;
-//                        answer /= 10;
-//                        count++;
-//                    }                   
+                   answer=ans_calculate(Number);
+                   for(count=0;count<Length;count++)
+                   {
+                       Number[count]=0;
+                   }
+                   count=0;
+                   while (answer)
+                   {
+                       Number[count] = answer % 10;
+                       answer /= 10;
+                       count++;
+                   }                   
             } else if (KeyNum <= 16) {
                 if (show_mode == 1) {
                     Number[Scintillation_bit + Offset] = KeyNum;
