@@ -401,16 +401,6 @@
               <FileType>5</FileType>
               <FilePath>.\Key.h</FilePath>
             </File>
-            <File>
-              <FileName>calculate.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>.\calculate.h</FilePath>
-            </File>
-            <File>
-              <FileName>calculate.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>.\calculate.c</FilePath>
-            </File>
           </Files>
         </Group>
       </Groups>

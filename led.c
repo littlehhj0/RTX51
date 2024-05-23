@@ -2,7 +2,7 @@
 #include <reg52.h>
 #include <string.h>
 #include "Key.h"
-#include "calculate.h"
+//#include "calculate.h"
 #define Independent_button_1 21 // 独立按键1   模式切换
 #define Independent_button_2 22 // 独立按键2   位数切换
 #define Independent_button_3 23 // 独立按键3    清零
@@ -14,7 +14,7 @@ unsigned char show_length       = 20;  // 显示长度
 int show_mode                   = -1; // 显示模式，0是正常显示模式，1是修改模式  -1是输入模式
 unsigned char Scintillation_bit = 0;  // 闪烁位
 bit Scintillation_flag          = 0;  // 0表示闪烁位灭，1表示闪烁位亮
-int answer;
+long int answer                      = 49154;
 // unsigned char Number[Length] = {10, 11, 12, 13, 14, 15, 16, 7, 8, 9, 1, 1, 2, 3, 4, 5,0,0,0,0,0,0,0,0};
 unsigned char Number[Length] = {1, 2, 3, 15,11, 4, 2, 5, 14, 6, 2, 8, 16, 3, 2, 12, 14, 7, 8, 4};
 // 123*(425-628/32)-784
@@ -122,17 +122,18 @@ void Task_2(void) _task_ 2
                 Scintillation_bit = 0;
             } else if (KeyNum == Independent_button_4) { // 独立按键4
                                                          // 计算
-                   answer=ans_calculate(Number);
+                   //answer=ans_calculate(Number);
+										answer              = 49154;
                    for(count=0;count<Length;count++)
                    {
                        Number[count]=0;
                    }
-                   count=0;
+                   count=4;
                    while (answer)
                    {
                        Number[count] = answer % 10;
                        answer /= 10;
-                       count++;
+                       count--;
                    }                   
             } else if (KeyNum <= 16) {
                 if (show_mode == 1) {

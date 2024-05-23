@@ -1,4 +1,4 @@
-C51 COMPILER V9.60.7.0   LED                                                               05/23/2024 21:57:32 PAGE 1   
+C51 COMPILER V9.60.7.0   LED                                                               05/23/2024 22:13:43 PAGE 1   
 
 
 C51 COMPILER V9.60.7.0, COMPILATION OF MODULE LED
@@ -12,7 +12,7 @@ line level    source
    2          #include <reg52.h>
    3          #include <string.h>
    4          #include "Key.h"
-   5          #include "calculate.h"
+   5          //#include "calculate.h"
    6          #define Independent_button_1 21 // 独立按键1   模式切换
    7          #define Independent_button_2 22 // 独立按键2   位数切换
    8          #define Independent_button_3 23 // 独立按键3    清零
@@ -25,7 +25,7 @@ line level    source
   14          int show_mode                   = -1; // 显示模式，0是正常显示模式，1是修改模式  -1是输入模式
   15          unsigned char Scintillation_bit = 0;  // 闪烁位
   16          bit Scintillation_flag          = 0;  // 0表示闪烁位灭，1表示闪烁位亮
-  17          int answer;
+  17          long int answer                      = 49154;
   18          // unsigned char Number[Length] = {10, 11, 12, 13, 14, 15, 16, 7, 8, 9, 1, 1, 2, 3, 4, 5,0,0,0,0,0,0,0,0};
   19          unsigned char Number[Length] = {1, 2, 3, 15,11, 4, 2, 5, 14, 6, 2, 8, 16, 3, 2, 12, 14, 7, 8, 4};
   20          // 123*(425-628/32)-784
@@ -62,7 +62,7 @@ line level    source
   51   3                  else
   52   3                      P0 = Scintillation_flag ? 0x00 : NT[Number[Location + Offset]];
   53   3              } else if (show_mode == -1) {
-C51 COMPILER V9.60.7.0   LED                                                               05/23/2024 21:57:32 PAGE 2   
+C51 COMPILER V9.60.7.0   LED                                                               05/23/2024 22:13:43 PAGE 2   
 
   54   3                  P0 = NT[Number[Location]];
   55   3              } else {
@@ -126,7 +126,7 @@ line level    source
  113   6                              Offset++;
  114   6                          }
  115   5                      }
-C51 COMPILER V9.60.7.0   LED                                                               05/23/2024 21:57:32 PAGE 3   
+C51 COMPILER V9.60.7.0   LED                                                               05/23/2024 22:13:43 PAGE 3   
 
  116   4                  } else if (KeyNum == Independent_button_3) { // 独立按键3
  117   4                      show_mode = -1;
@@ -137,41 +137,43 @@ line level    source
  122   4                      Scintillation_bit = 0;
  123   4                  } else if (KeyNum == Independent_button_4) { // 独立按键4
  124   4                                                               // 计算
- 125   4      //                    answer=ans_calculate(Number);
- 126   4      //                    for(count=0;count<Length;count++)
- 127   4      //                    {
- 128   4      //                        Number[count]=0;
- 129   4      //                    }
- 130   4      //                    count=0;
- 131   4      //                    while (answer)
- 132   4      //                    {
- 133   4      //                        Number[count] = answer % 10;
- 134   4      //                        answer /= 10;
- 135   4      //                        count++;
- 136   4      //                    }                   
- 137   4                  } else if (KeyNum <= 16) {
- 138   4                      if (show_mode == 1) {
- 139   5                          Number[Scintillation_bit + Offset] = KeyNum;
- 140   5                      } else if (show_mode == -1) {
+ 125   4                         //answer=ans_calculate(Number);
+ 126   4                          answer              = 49154;
+ 127   4                         for(count=0;count<Length;count++)
+ 128   4                         {
+ 129   5                             Number[count]=0;
+ 130   5                         }
+ 131   4                         count=4;
+ 132   4                         while (answer)
+ 133   4                         {
+ 134   5                             Number[count] = answer % 10;
+ 135   5                                //Number[count] = 1;
+ 136   5                             answer /= 10;
+ 137   5                             count--;
+ 138   5                         }                   
+ 139   4                  } else if (KeyNum <= 16) {
+ 140   4                      if (show_mode == 1) {
  141   5                          Number[Scintillation_bit + Offset] = KeyNum;
- 142   5                          Scintillation_bit++;
- 143   5                          show_length++;
- 144   5                          if (Scintillation_bit > 8) {
- 145   6                              Scintillation_bit = 8;
- 146   6                              Offset++;
- 147   6                          }
- 148   5                      }
- 149   4                  }
- 150   3              }
- 151   2              os_wait2(K_TMO, 10);
- 152   2          }
- 153   1      }
+ 142   5                      } else if (show_mode == -1) {
+ 143   5                          Number[Scintillation_bit + Offset] = KeyNum;
+ 144   5                          Scintillation_bit++;
+ 145   5                          show_length++;
+ 146   5                          if (Scintillation_bit > 8) {
+ 147   6                              Scintillation_bit = 8;
+ 148   6                              Offset++;
+ 149   6                          }
+ 150   5                      }
+ 151   4                  }
+ 152   3              }
+ 153   2              os_wait2(K_TMO, 10);
+ 154   2          }
+ 155   1      }
 
 
 MODULE INFORMATION:   STATIC OVERLAYABLE
-   CODE SIZE        =    748    ----
+   CODE SIZE        =    926    ----
    CONSTANT SIZE    =     17    ----
-   XDATA SIZE       =     37    ----
+   XDATA SIZE       =     39    ----
    PDATA SIZE       =   ----    ----
    DATA SIZE        =   ----    ----
    IDATA SIZE       =   ----    ----
