@@ -1,0 +1,192 @@
+C51 COMPILER V9.60.7.0   LED                                                               05/22/2024 23:03:03 PAGE 1   
+
+
+C51 COMPILER V9.60.7.0, COMPILATION OF MODULE LED
+OBJECT MODULE PLACED IN .\Objects\led.obj
+COMPILER INVOKED BY: d:\Keil_v5\C51\BIN\C51.EXE led.c OPTIMIZE(8,SPEED) BROWSE DEBUG OBJECTEXTEND PRINT(.\Listings\led.l
+                    -st) TABS(2) OBJECT(.\Objects\led.obj)
+
+line level    source
+
+   1          #include <rtx51tny.h>
+   2          #include <reg52.h>
+   3          #include "Key.h"
+   4          #define Independent_button_1 21  //独立按键1   模式切换
+   5          #define Independent_button_2 22  //独立按键2   位数切换
+   6          #define Independent_button_3 23  //独立按键3    清零
+   7          #define Independent_button_4 24  //独立按键4    计算
+   8          //0-9 无显示 左右括号加减乘除
+   9          unsigned char NT[] = {0x08, 0x06, 0x5B, 0x4F, 0x66, 0x6D, 0x7D, 0x07, 0x7F, 0x6F, 0x3F, 0x39, 0x0f,0x70, 0
+             -x40, 0x80, 0x46};
+  10          #define Length 24
+  11          unsigned char show_length = 1;  //显示长度
+  12          int show_mode=-1;  //显示模式，0是正常显示模式，1是修改模式  -1是输入模式
+  13          unsigned char Scintillation_bit = 0;  //闪烁位  
+  14          bit Scintillation_flag=0;  //0表示闪烁位灭，1表示闪烁位亮
+  15          //unsigned char Number[Length] = {10, 11, 12, 13, 14, 15, 16, 7, 8, 9, 1, 1, 2, 3, 4, 5,0,0,0,0,0,0,0,0};
+  16          unsigned char Number[Length]    = {0,0,0,0,0,0,0};
+  17          
+  18          sbit P2_2             = P2 ^ 2;
+  19          sbit P2_3             = P2 ^ 3;
+  20          sbit P2_4             = P2 ^ 4;
+  21          unsigned int Location = 0;   //显示位置
+  22          unsigned int Offset   = 0;  //偏移量
+  23          unsigned char KeyNum;   //按下的按键
+  24            
+  25          void display(void) _task_ 0
+  26          {
+  27   1          os_create_task(1);
+  28   1          os_create_task(2);
+  29   1          os_create_task(3);
+  30   1          while (1) {
+  31   2              P0 = 0x00;
+  32   2              switch(Location)
+  33   2              {
+  34   3                case 0:P2_4=1;P2_3=1;P2_2=1;break;
+  35   3                case 1:P2_4=1;P2_3=1;P2_2=0;break;
+  36   3                case 2:P2_4=1;P2_3=0;P2_2=1;break;
+  37   3                case 3:P2_4=1;P2_3=0;P2_2=0;break;
+  38   3                case 4:P2_4=0;P2_3=1;P2_2=1;break;
+  39   3                case 5:P2_4=0;P2_3=1;P2_2=0;break;
+  40   3                case 6:P2_4=0;P2_3=0;P2_2=1;break;
+  41   3                case 7:P2_4=0;P2_3=0;P2_2=0;break;
+  42   3              }
+  43   2              if(!show_mode)
+  44   2                      P0 = NT[Number[Location+Offset]];
+  45   2              else if(show_mode)
+  46   2              {
+  47   3                if(Scintillation_bit!=Location)
+  48   3                P0 = NT[Number[Location+Offset]];
+  49   3                else 
+  50   3                  P0=Scintillation_flag?0x00:NT[Number[Location+Offset]];
+  51   3              }
+  52   2                      else if (show_mode == -1)
+  53   2                      {
+C51 COMPILER V9.60.7.0   LED                                                               05/22/2024 23:03:03 PAGE 2   
+
+  54   3                          P0 = NT[Number[Location]];
+  55   3                      }
+  56   2                      else{
+  57   3      
+  58   3                      }
+  59   2              Location++;
+  60   2              Location = Location % 8;
+  61   2              os_wait2(K_TMO,1);
+  62   2          }
+  63   1      }
+  64          int i=0;
+  65          void show_mode_change(void) _task_ 1
+  66          {
+  67   1          while (1)
+  68   1          {
+  69   2            if(show_mode==0)  //显示模式，每次刷新8个位置
+  70   2            {
+  71   3                      if(show_length>=8)
+  72   3                      {
+  73   4                          Offset+=1;
+  74   4                  Offset%=(Length-8);
+  75   4                      }
+  76   3              for(i=0;i<=3;i++)
+  77   3                os_wait2(K_TMO, 700);
+  78   3            }
+  79   2            else if(show_mode==1||show_mode==-1)    //修改模式，每次翻转当前位数码管
+  80   2            {
+  81   3              Scintillation_flag=!Scintillation_flag;
+  82   3              for(i=0;i<=2;i++)
+  83   3                os_wait2(K_TMO, 430);
+  84   3            }
+  85   2          
+  86   2          }
+  87   1      }
+  88          void Task_3(void) _task_ 3
+  89          {
+  90   1      
+  91   1          while (1)
+  92   1          {
+  93   2            Key_Loop();
+  94   2            os_wait2(K_TMO, 70);
+  95   2          }
+  96   1      }
+  97          int count = 0;
+  98          void Task_2(void) _task_ 2
+  99          {
+ 100   1          while (1)
+ 101   1          {
+ 102   2            KeyNum=Key();
+ 103   2            if(KeyNum)
+ 104   2            {
+ 105   3                      if (KeyNum == Independent_button_1) {  //独立按键1
+ 106   4                          if(show_mode==-1)
+ 107   4                          {
+ 108   5                              show_mode=0;
+ 109   5                              Scintillation_bit=0;
+ 110   5                              Offset=0;
+ 111   5                          }
+ 112   4                          else if (show_mode == 0||show_mode==1)
+ 113   4                          {
+ 114   5                              show_mode = !show_mode;
+ 115   5                              Scintillation_bit=0;
+C51 COMPILER V9.60.7.0   LED                                                               05/22/2024 23:03:03 PAGE 3   
+
+ 116   5                              Offset=0;
+ 117   5                              show_length=1;
+ 118   5                          }
+ 119   4                      }
+ 120   3                      else if (KeyNum == Independent_button_2) {  //独立按键2
+ 121   4                          if(show_mode==1)
+ 122   4                          {
+ 123   5                              Scintillation_bit++;
+ 124   5                              if(Scintillation_bit> 8)
+ 125   5                              {
+ 126   6                                  Scintillation_bit = 8;
+ 127   6                                  Offset++;
+ 128   6                              }
+ 129   5                          }
+ 130   4                      }
+ 131   3                      else if (KeyNum == Independent_button_3) {  //独立按键3
+ 132   4                          show_mode = -1;
+ 133   4                          for (count = 0; count < Length; count++) {
+ 134   5                              Number[count] = 0;
+ 135   5                          }
+ 136   4                          Offset = 0;
+ 137   4                          Scintillation_bit = 0;
+ 138   4                      }
+ 139   3                      else if (KeyNum == Independent_button_4) {  //独立按键4  
+ 140   4      
+ 141   4                      }
+ 142   3                      else if(KeyNum<=16)
+ 143   3                      {
+ 144   4                          if(show_mode==1)
+ 145   4                          {
+ 146   5                              Number[Scintillation_bit+Offset]=KeyNum;
+ 147   5                          }
+ 148   4                          else if(show_mode==-1)
+ 149   4                          {
+ 150   5                              Number[Scintillation_bit + Offset] = KeyNum;
+ 151   5                              Scintillation_bit++;
+ 152   5                              show_length++;
+ 153   5                              if (Scintillation_bit > 8) {
+ 154   6                                  Scintillation_bit = 8;
+ 155   6                                  Offset++;
+ 156   6                              }
+ 157   5                          }
+ 158   4                      }
+ 159   3      
+ 160   3            }
+ 161   2            os_wait2(K_TMO, 10);
+ 162   2          }
+ 163   1      }
+
+
+MODULE INFORMATION:   STATIC OVERLAYABLE
+   CODE SIZE        =    594    ----
+   CONSTANT SIZE    =   ----    ----
+   XDATA SIZE       =   ----    ----
+   PDATA SIZE       =   ----    ----
+   DATA SIZE        =     54    ----
+   IDATA SIZE       =   ----    ----
+   BIT SIZE         =      1    ----
+END OF MODULE INFORMATION.
+
+
+C51 COMPILATION COMPLETE.  0 WARNING(S),  0 ERROR(S)

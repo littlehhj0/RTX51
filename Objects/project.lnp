@@ -1,0 +1,6 @@
+".\Objects\STARTUP.obj",
+".\Objects\led.obj",
+".\Objects\Conf_tny.obj",
+".\Objects\Key.obj" 
+TO ".\Objects\project" Rtx51Tiny 
+PRINT(".\Listings\project.m51") RAMSIZE(256) 
