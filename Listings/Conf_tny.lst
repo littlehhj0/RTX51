@@ -1,9 +1,9 @@
-A51 MACRO ASSEMBLER  CONF_TNY                                                             05/21/2024 22:56:58 PAGE     1
+A51 MACRO ASSEMBLER  CONF_TNY                                                             05/23/2024 21:17:50 PAGE     1
 
 
 MACRO ASSEMBLER A51 V8.2.7.0
 OBJECT MODULE PLACED IN .\Objects\Conf_tny.obj
-ASSEMBLER INVOKED BY: d:\Keil_v5\C51\BIN\A51.EXE Conf_tny.A51 SET(SMALL) DEBUG PRINT(.\Listings\Conf_tny.lst) OBJECT(.\O
+ASSEMBLER INVOKED BY: d:\Keil_v5\C51\BIN\A51.EXE Conf_tny.A51 SET(LARGE) DEBUG PRINT(.\Listings\Conf_tny.lst) OBJECT(.\O
                       bjects\Conf_tny.obj) EP
 
 LOC  OBJ            LINE     SOURCE
@@ -65,7 +65,7 @@ LOC  OBJ            LINE     SOURCE
                       55     ;
                       56     ;  Define instructions executed on a hardware timer interrupt.
                       57     HW_TIMER_CODE   MACRO
-A51 MACRO ASSEMBLER  CONF_TNY                                                             05/21/2024 22:56:58 PAGE     2
+A51 MACRO ASSEMBLER  CONF_TNY                                                             05/23/2024 21:17:50 PAGE     2
 
                       58                                     ; Empty Macro by default
                       59                     RETI
@@ -133,7 +133,7 @@ LOC  OBJ            LINE     SOURCE
                      121     ;----------------- !!! End of User Configuration Part    !!! ------------------
                      122     ;----------------- !!! Do not modify code sections below !!! ------------------
                      123     ;------------------------------------------------------------------------------
-A51 MACRO ASSEMBLER  CONF_TNY                                                             05/21/2024 22:56:58 PAGE     3
+A51 MACRO ASSEMBLER  CONF_TNY                                                             05/23/2024 21:17:50 PAGE     3
 
                      124     
                      125     ; SFR Symbols
@@ -201,7 +201,7 @@ LOC  OBJ            LINE     SOURCE
                      187     IF (CODE_BANKING <> 0)
                              EXTRN   DATA    (?B_CURRENTBANK)
                              EXTRN   CODE    (?B_RESTORE_BANK)
-A51 MACRO ASSEMBLER  CONF_TNY                                                             05/21/2024 22:56:58 PAGE     4
+A51 MACRO ASSEMBLER  CONF_TNY                                                             05/23/2024 21:17:50 PAGE     4
 
                              ENDIF
                      191     
@@ -269,7 +269,7 @@ LOC  OBJ            LINE     SOURCE
   0007               253     B_RDY           EQU     7
                      254     
                      255     
-A51 MACRO ASSEMBLER  CONF_TNY                                                             05/21/2024 22:56:58 PAGE     5
+A51 MACRO ASSEMBLER  CONF_TNY                                                             05/23/2024 21:17:50 PAGE     5
 
                      256     IF (TIMESHARING OR CPU_IDLE_CODE)
                      257     ?RTX?BITS       SEGMENT BIT
@@ -337,7 +337,7 @@ LOC  OBJ            LINE     SOURCE
 0023 E6              323                     MOV     A,@R0
 0024 BC0002   F      324                     CJNE    currenttask,#?RTX_MAXTASKN,checkstack
 0027 74FF            325                     MOV     A,#RAMTOP
-A51 MACRO ASSEMBLER  CONF_TNY                                                             05/21/2024 22:56:58 PAGE     6
+A51 MACRO ASSEMBLER  CONF_TNY                                                             05/23/2024 21:17:50 PAGE     6
 
 0029 C3              326     checkstack:     CLR     C
 002A 9581            327                     SUBB    A,SP
@@ -405,7 +405,7 @@ LOC  OBJ            LINE     SOURCE
                              ENDIF
                      390     
 006E E50C            391                     MOV     A,?RTX_CURRENTTASK
-A51 MACRO ASSEMBLER  CONF_TNY                                                             05/21/2024 22:56:58 PAGE     7
+A51 MACRO ASSEMBLER  CONF_TNY                                                             05/23/2024 21:17:50 PAGE     7
 
 0070 23              392                     RL      A
 0071 2400     F      393                     ADD     A,#?RTX?TASKSTATE?S+1
@@ -473,7 +473,7 @@ LOC  OBJ            LINE     SOURCE
                      456     ;      }
                      457     ;
                      458     
-A51 MACRO ASSEMBLER  CONF_TNY                                                             05/21/2024 22:56:58 PAGE     8
+A51 MACRO ASSEMBLER  CONF_TNY                                                             05/23/2024 21:17:50 PAGE     8
 
                      459     PUBLIC  ?RTX_NEXTID
                      460     PUBLIC  ?RTX_NEXTTASK
@@ -541,7 +541,7 @@ LOC  OBJ            LINE     SOURCE
 00D2 BE0002   F      522                     CJNE    R6,#?RTX_MAXTASKN,?C0013
 00D5 74FF            523                     MOV     A,#RAMTOP
 00D7                 524     ?C0013:
-A51 MACRO ASSEMBLER  CONF_TNY                                                             05/21/2024 22:56:58 PAGE     9
+A51 MACRO ASSEMBLER  CONF_TNY                                                             05/23/2024 21:17:50 PAGE     9
 
 00D7 FD              525                     MOV     R5,A
                      526     ;        limit = STKP[current];
@@ -609,7 +609,7 @@ LOC  OBJ            LINE     SOURCE
 0114 C2E7            588     NoEvent:        CLR     ACC.B_RDY       ; Clear RDY bit
 0116 C6              589                     XCH     A,@R0
 0117 D2AF            590                     SETB    EA
-A51 MACRO ASSEMBLER  CONF_TNY                                                             05/21/2024 22:56:58 PAGE    10
+A51 MACRO ASSEMBLER  CONF_TNY                                                             05/23/2024 21:17:50 PAGE    10
 
                      591     
 0119 5480            592                     ANL     A,#K_RDY
@@ -677,7 +677,7 @@ LOC  OBJ            LINE     SOURCE
 014C DFFB            654                     DJNZ    R7,main1
 014E 7F00     F      655     main2:          MOV     R7,#?RTX_MAXTASKN+1
 0150 E4              656                     CLR     A
-A51 MACRO ASSEMBLER  CONF_TNY                                                             05/21/2024 22:56:58 PAGE    11
+A51 MACRO ASSEMBLER  CONF_TNY                                                             05/23/2024 21:17:50 PAGE    11
 
 0151 7800     F      657                     MOV     R0,#?RTX?TASKSTATE?S
 0153 F6              658     main1x:         MOV     @R0,A
@@ -712,7 +712,7 @@ LOC  OBJ            LINE     SOURCE
 017C 00       F      687     ?RTX_TASKIDX:   DB      ?RTX_MAXTASKN           ; for Debugging
                      688     
                      689                     END
-A51 MACRO ASSEMBLER  CONF_TNY                                                             05/21/2024 22:56:58 PAGE    12
+A51 MACRO ASSEMBLER  CONF_TNY                                                             05/23/2024 21:17:50 PAGE    12
 
 SYMBOL TABLE LISTING
 ------ ----- -------
@@ -780,7 +780,7 @@ CHECKSTACK . . . .  C ADDR   0029H   R   SEG=?RTX?CODE
 CODE_BANKING . . .  N NUMB   0000H   A   
 CPU_IDLE_CODE. . .  N NUMB   0001H   A   
 CURRENTTASK. . . .    REG    R4          
-A51 MACRO ASSEMBLER  CONF_TNY                                                             05/21/2024 22:56:58 PAGE    13
+A51 MACRO ASSEMBLER  CONF_TNY                                                             05/23/2024 21:17:50 PAGE    13
 
 DPH. . . . . . . .  D ADDR   0083H   A   
 DPL. . . . . . . .  D ADDR   0082H   A   

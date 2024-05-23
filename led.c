@@ -1,27 +1,30 @@
 #include <rtx51tny.h>
 #include <reg52.h>
+#include <string.h>
 #include "Key.h"
-#define Independent_button_1 21  //ç‹¬ç«‹æŒ‰é”®1   æ¨¡å¼åˆ‡æ¢
-#define Independent_button_2 22  //ç‹¬ç«‹æŒ‰é”®2   ä½æ•°åˆ‡æ¢
-#define Independent_button_3 23  //ç‹¬ç«‹æŒ‰é”®3    æ¸…é›¶
-#define Independent_button_4 24  //ç‹¬ç«‹æŒ‰é”®4    è®¡ç®—
-//0-9 æ— æ˜¾ç¤º å·¦å³æ‹¬å·åŠ å‡ä¹˜é™¤
-unsigned char NT[] = {0x08, 0x06, 0x5B, 0x4F, 0x66, 0x6D, 0x7D, 0x07, 0x7F, 0x6F, 0x3F, 0x39, 0x0f,0x70, 0x40, 0x80, 0x46};
+#include "calculate.h"
+#define Independent_button_1 21 // ¶ÀÁ¢°´¼ü1   Ä£Ê½ÇÐ»»
+#define Independent_button_2 22 // ¶ÀÁ¢°´¼ü2   Î»ÊýÇÐ»»
+#define Independent_button_3 23 // ¶ÀÁ¢°´¼ü3    ÇåÁã
+#define Independent_button_4 24 // ¶ÀÁ¢°´¼ü4    ¼ÆËã
+// 0-9 ÎÞÏÔÊ¾ 11×ó12ÓÒÀ¨ºÅ13¼Ó14¼õ15³Ë16³ý
+code unsigned char NT[] = {0x08, 0x06, 0x5B, 0x4F, 0x66, 0x6D, 0x7D, 0x07, 0x7F, 0x6F, 0x3F, 0x39, 0x0f, 0x70, 0x40, 0x80, 0x46};
 #define Length 24
-unsigned char show_length = 1;  //æ˜¾ç¤ºé•¿åº¦
-int show_mode=-1;  //æ˜¾ç¤ºæ¨¡å¼ï¼Œ0æ˜¯æ­£å¸¸æ˜¾ç¤ºæ¨¡å¼ï¼Œ1æ˜¯ä¿®æ”¹æ¨¡å¼  -1æ˜¯è¾“å…¥æ¨¡å¼
-unsigned char Scintillation_bit = 0;  //é—ªçƒä½  
-bit Scintillation_flag=0;  //0è¡¨ç¤ºé—ªçƒä½ç­ï¼Œ1è¡¨ç¤ºé—ªçƒä½äº®
-//unsigned char Number[Length] = {10, 11, 12, 13, 14, 15, 16, 7, 8, 9, 1, 1, 2, 3, 4, 5,0,0,0,0,0,0,0,0};
-unsigned char Number[Length]    = {0,0,0,0,0,0,0};
-
+unsigned char show_length       = 20;  // ÏÔÊ¾³¤¶È
+int show_mode                   = -1; // ÏÔÊ¾Ä£Ê½£¬0ÊÇÕý³£ÏÔÊ¾Ä£Ê½£¬1ÊÇÐÞ¸ÄÄ£Ê½  -1ÊÇÊäÈëÄ£Ê½
+unsigned char Scintillation_bit = 0;  // ÉÁË¸Î»
+bit Scintillation_flag          = 0;  // 0±íÊ¾ÉÁË¸Î»Ãð£¬1±íÊ¾ÉÁË¸Î»ÁÁ
+int answer;
+// unsigned char Number[Length] = {10, 11, 12, 13, 14, 15, 16, 7, 8, 9, 1, 1, 2, 3, 4, 5,0,0,0,0,0,0,0,0};
+unsigned char Number[Length] = {1, 2, 3, 15,11, 4, 2, 5, 14, 6, 2, 8, 16, 3, 2, 12, 14, 7, 8, 4};
+// 123*(425-628/32)-784
 sbit P2_2             = P2 ^ 2;
 sbit P2_3             = P2 ^ 3;
 sbit P2_4             = P2 ^ 4;
-unsigned int Location = 0;   //æ˜¾ç¤ºä½ç½®
-unsigned int Offset   = 0;  //åç§»é‡
-unsigned char KeyNum;   //æŒ‰ä¸‹çš„æŒ‰é”®
-	
+unsigned char Location = 0; // ÏÔÊ¾Î»ÖÃ
+unsigned char Offset   = 0; // Æ«ÒÆÁ¿
+unsigned char KeyNum;      // °´ÏÂµÄ°´¼ü
+
 void display(void) _task_ 0
 {
     os_create_task(1);
@@ -30,134 +33,121 @@ void display(void) _task_ 0
     while (1) {
         P0 = 0x00;
         switch(Location)
-				{
-					case 0:P2_4=1;P2_3=1;P2_2=1;break;
-					case 1:P2_4=1;P2_3=1;P2_2=0;break;
-					case 2:P2_4=1;P2_3=0;P2_2=1;break;
-					case 3:P2_4=1;P2_3=0;P2_2=0;break;
-					case 4:P2_4=0;P2_3=1;P2_2=1;break;
-					case 5:P2_4=0;P2_3=1;P2_2=0;break;
-					case 6:P2_4=0;P2_3=0;P2_2=1;break;
-					case 7:P2_4=0;P2_3=0;P2_2=0;break;
-				}
-				if(!show_mode)
-                P0 = NT[Number[Location+Offset]];
-				else if(show_mode)
-				{
-					if(Scintillation_bit!=Location)
-					P0 = NT[Number[Location+Offset]];
-					else 
-						P0=Scintillation_flag?0x00:NT[Number[Location+Offset]];
-				}
-                else if (show_mode == -1)
-                {
-                    P0 = NT[Number[Location]];
-                }
-                else{
-
-                }
-				Location++;
+	{
+		case 0:P2_4=1;P2_3=1;P2_2=1;break;
+		case 1:P2_4=1;P2_3=1;P2_2=0;break;
+		case 2:P2_4=1;P2_3=0;P2_2=1;break;
+		case 3:P2_4=1;P2_3=0;P2_2=0;break;
+		case 4:P2_4=0;P2_3=1;P2_2=1;break;
+		case 5:P2_4=0;P2_3=1;P2_2=0;break;
+		case 6:P2_4=0;P2_3=0;P2_2=1;break;
+		case 7:P2_4=0;P2_3=0;P2_2=0;break;
+	}
+        if (!show_mode)
+            P0 = NT[Number[Location + Offset]];
+        else if (show_mode) {
+            if (Scintillation_bit != Location)
+                P0 = NT[Number[Location + Offset]];
+            else
+                P0 = Scintillation_flag ? 0x00 : NT[Number[Location + Offset]];
+        } else if (show_mode == -1) {
+            P0 = NT[Number[Location]];
+        } else {
+        }
+        Location++;
         Location = Location % 8;
-        os_wait2(K_TMO,1);
+        os_wait2(K_TMO, 1);
     }
 }
-int i=0;
+int i = 0;
 void show_mode_change(void) _task_ 1
 {
-    while (1)
-    {
-			if(show_mode==0)  //æ˜¾ç¤ºæ¨¡å¼ï¼Œæ¯æ¬¡åˆ·æ–°8ä¸ªä½ç½®
-			{
-                if(show_length>=8)
-                {
-                    Offset+=1;
-				    Offset%=(Length-8);
-                }
-				for(i=0;i<=3;i++)
-					os_wait2(K_TMO, 700);
-			}
-			else if(show_mode==1||show_mode==-1)    //ä¿®æ”¹æ¨¡å¼ï¼Œæ¯æ¬¡ç¿»è½¬å½“å‰ä½æ•°ç ç®¡
-			{
-				Scintillation_flag=!Scintillation_flag;
-				for(i=0;i<=2;i++)
-					os_wait2(K_TMO, 430);
-			}
-		
+    while (1) {
+        if (show_mode == 0) // ÏÔÊ¾Ä£Ê½£¬Ã¿´ÎË¢ÐÂ8¸öÎ»ÖÃ
+        {
+            if (show_length >= 8) {
+                Offset += 1;
+                Offset %= (show_length - 7);
+            }
+            for (i = 0; i <= 3; i++)
+                os_wait2(K_TMO, 700);
+        } else if (show_mode == 1 || show_mode == -1) // ÐÞ¸ÄÄ£Ê½£¬Ã¿´Î·­×ªµ±Ç°Î»ÊýÂë¹Ü
+        {
+            Scintillation_flag = !Scintillation_flag;
+            for (i = 0; i <= 2; i++)
+                os_wait2(K_TMO, 430);
+        }
     }
 }
+
 void Task_3(void) _task_ 3
 {
 
-    while (1)
-    {
-			Key_Loop();
-			os_wait2(K_TMO, 70);
+    while (1) {
+        Key_Loop();
+        os_wait2(K_TMO, 70);
     }
 }
 int count = 0;
 void Task_2(void) _task_ 2
 {
-    while (1)
-    {
-			KeyNum=Key();
-			if(KeyNum)
-			{
-                if (KeyNum == Independent_button_1) {  //ç‹¬ç«‹æŒ‰é”®1
-                    if(show_mode==-1)
-                    {
-                        show_mode=0;
-                        Scintillation_bit=0;
-                        Offset=0;
-                    }
-                    else if (show_mode == 0||show_mode==1)
-                    {
-                        show_mode = !show_mode;
-                        Scintillation_bit=0;
-                        Offset=0;
-                        show_length=1;
-                    }
-                }
-                else if (KeyNum == Independent_button_2) {  //ç‹¬ç«‹æŒ‰é”®2
-                    if(show_mode==1)
-                    {
-                        Scintillation_bit++;
-                        if(Scintillation_bit> 8)
-                        {
-                            Scintillation_bit = 8;
-                            Offset++;
-                        }
-                    }
-                }
-                else if (KeyNum == Independent_button_3) {  //ç‹¬ç«‹æŒ‰é”®3
-                    show_mode = -1;
-                    for (count = 0; count < Length; count++) {
-                        Number[count] = 0;
-                    }
-                    Offset = 0;
+    while (1) {
+        KeyNum = Key();
+        if (KeyNum) {
+            if (KeyNum == Independent_button_1) { // ¶ÀÁ¢°´¼ü1
+                if (show_mode == -1) {
+                    show_mode         = 0;
                     Scintillation_bit = 0;
+                    Offset            = 0;
+                } else if (show_mode == 0 || show_mode == 1) {
+                    show_mode         = !show_mode;
+                    Scintillation_bit = 0;
+                    Offset            = 0;
+                    show_length       = 1;
                 }
-                else if (KeyNum == Independent_button_4) {  //ç‹¬ç«‹æŒ‰é”®4  
-
-                }
-                else if(KeyNum<=16)
-                {
-                    if(show_mode==1)
-                    {
-                        Number[Scintillation_bit+Offset]=KeyNum;
-                    }
-                    else if(show_mode==-1)
-                    {
-                        Number[Scintillation_bit + Offset] = KeyNum;
-                        Scintillation_bit++;
-                        show_length++;
-                        if (Scintillation_bit > 8) {
-                            Scintillation_bit = 8;
-                            Offset++;
-                        }
+            } else if (KeyNum == Independent_button_2) { // ¶ÀÁ¢°´¼ü2
+                if (show_mode == 1) {
+                    Scintillation_bit++;
+                    if (Scintillation_bit > 8) {
+                        Scintillation_bit = 8;
+                        Offset++;
                     }
                 }
-
-			}
-			os_wait2(K_TMO, 10);
+            } else if (KeyNum == Independent_button_3) { // ¶ÀÁ¢°´¼ü3
+                show_mode = -1;
+                for (count = 0; count < Length; count++) {
+                    Number[count] = 0;
+                }
+                Offset            = 0;
+                Scintillation_bit = 0;
+            } else if (KeyNum == Independent_button_4) { // ¶ÀÁ¢°´¼ü4
+                                                         // ¼ÆËã
+//                    answer=ans_calculate(Number);
+//                    for(count=0;count<Length;count++)
+//                    {
+//                        Number[count]=0;
+//                    }
+//                    count=0;
+//                    while (answer)
+//                    {
+//                        Number[count] = answer % 10;
+//                        answer /= 10;
+//                        count++;
+//                    }                   
+            } else if (KeyNum <= 16) {
+                if (show_mode == 1) {
+                    Number[Scintillation_bit + Offset] = KeyNum;
+                } else if (show_mode == -1) {
+                    Number[Scintillation_bit + Offset] = KeyNum;
+                    Scintillation_bit++;
+                    show_length++;
+                    if (Scintillation_bit > 8) {
+                        Scintillation_bit = 8;
+                        Offset++;
+                    }
+                }
+            }
+        }
+        os_wait2(K_TMO, 10);
     }
 }

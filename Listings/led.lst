@@ -1,189 +1,179 @@
-C51 COMPILER V9.60.7.0   LED                                                               05/22/2024 23:03:03 PAGE 1   
+C51 COMPILER V9.60.7.0   LED                                                               05/23/2024 21:57:32 PAGE 1   
 
 
 C51 COMPILER V9.60.7.0, COMPILATION OF MODULE LED
 OBJECT MODULE PLACED IN .\Objects\led.obj
-COMPILER INVOKED BY: d:\Keil_v5\C51\BIN\C51.EXE led.c OPTIMIZE(8,SPEED) BROWSE DEBUG OBJECTEXTEND PRINT(.\Listings\led.l
-                    -st) TABS(2) OBJECT(.\Objects\led.obj)
+COMPILER INVOKED BY: d:\Keil_v5\C51\BIN\C51.EXE led.c LARGE OPTIMIZE(8,SPEED) BROWSE DEBUG OBJECTEXTEND PRINT(.\Listings
+                    -\led.lst) TABS(2) OBJECT(.\Objects\led.obj)
 
 line level    source
 
    1          #include <rtx51tny.h>
    2          #include <reg52.h>
-   3          #include "Key.h"
-   4          #define Independent_button_1 21  //ç‹¬ç«‹æŒ‰é”®1   æ¨¡å¼åˆ‡æ¢
-   5          #define Independent_button_2 22  //ç‹¬ç«‹æŒ‰é”®2   ä½æ•°åˆ‡æ¢
-   6          #define Independent_button_3 23  //ç‹¬ç«‹æŒ‰é”®3    æ¸…é›¶
-   7          #define Independent_button_4 24  //ç‹¬ç«‹æŒ‰é”®4    è®¡ç®—
-   8          //0-9 æ— æ˜¾ç¤º å·¦å³æ‹¬å·åŠ å‡ä¹˜é™¤
-   9          unsigned char NT[] = {0x08, 0x06, 0x5B, 0x4F, 0x66, 0x6D, 0x7D, 0x07, 0x7F, 0x6F, 0x3F, 0x39, 0x0f,0x70, 0
-             -x40, 0x80, 0x46};
-  10          #define Length 24
-  11          unsigned char show_length = 1;  //æ˜¾ç¤ºé•¿åº¦
-  12          int show_mode=-1;  //æ˜¾ç¤ºæ¨¡å¼ï¼Œ0æ˜¯æ­£å¸¸æ˜¾ç¤ºæ¨¡å¼ï¼Œ1æ˜¯ä¿®æ”¹æ¨¡å¼  -1æ˜¯è¾“å…¥æ¨¡å¼
-  13          unsigned char Scintillation_bit = 0;  //é—ªçƒä½  
-  14          bit Scintillation_flag=0;  //0è¡¨ç¤ºé—ªçƒä½ç­ï¼Œ1è¡¨ç¤ºé—ªçƒä½äº®
-  15          //unsigned char Number[Length] = {10, 11, 12, 13, 14, 15, 16, 7, 8, 9, 1, 1, 2, 3, 4, 5,0,0,0,0,0,0,0,0};
-  16          unsigned char Number[Length]    = {0,0,0,0,0,0,0};
-  17          
-  18          sbit P2_2             = P2 ^ 2;
-  19          sbit P2_3             = P2 ^ 3;
-  20          sbit P2_4             = P2 ^ 4;
-  21          unsigned int Location = 0;   //æ˜¾ç¤ºä½ç½®
-  22          unsigned int Offset   = 0;  //åç§»é‡
-  23          unsigned char KeyNum;   //æŒ‰ä¸‹çš„æŒ‰é”®
-  24            
-  25          void display(void) _task_ 0
-  26          {
-  27   1          os_create_task(1);
-  28   1          os_create_task(2);
-  29   1          os_create_task(3);
-  30   1          while (1) {
-  31   2              P0 = 0x00;
-  32   2              switch(Location)
-  33   2              {
-  34   3                case 0:P2_4=1;P2_3=1;P2_2=1;break;
-  35   3                case 1:P2_4=1;P2_3=1;P2_2=0;break;
-  36   3                case 2:P2_4=1;P2_3=0;P2_2=1;break;
-  37   3                case 3:P2_4=1;P2_3=0;P2_2=0;break;
-  38   3                case 4:P2_4=0;P2_3=1;P2_2=1;break;
-  39   3                case 5:P2_4=0;P2_3=1;P2_2=0;break;
-  40   3                case 6:P2_4=0;P2_3=0;P2_2=1;break;
-  41   3                case 7:P2_4=0;P2_3=0;P2_2=0;break;
-  42   3              }
-  43   2              if(!show_mode)
-  44   2                      P0 = NT[Number[Location+Offset]];
-  45   2              else if(show_mode)
-  46   2              {
-  47   3                if(Scintillation_bit!=Location)
-  48   3                P0 = NT[Number[Location+Offset]];
-  49   3                else 
-  50   3                  P0=Scintillation_flag?0x00:NT[Number[Location+Offset]];
-  51   3              }
-  52   2                      else if (show_mode == -1)
-  53   2                      {
-C51 COMPILER V9.60.7.0   LED                                                               05/22/2024 23:03:03 PAGE 2   
+   3          #include <string.h>
+   4          #include "Key.h"
+   5          #include "calculate.h"
+   6          #define Independent_button_1 21 // ¶ÀÁ¢°´¼ü1   Ä£Ê½ÇĞ»»
+   7          #define Independent_button_2 22 // ¶ÀÁ¢°´¼ü2   Î»ÊıÇĞ»»
+   8          #define Independent_button_3 23 // ¶ÀÁ¢°´¼ü3    ÇåÁã
+   9          #define Independent_button_4 24 // ¶ÀÁ¢°´¼ü4    ¼ÆËã
+  10          // 0-9 ÎŞÏÔÊ¾ 11×ó12ÓÒÀ¨ºÅ13¼Ó14¼õ15³Ë16³ı
+  11          code unsigned char NT[] = {0x08, 0x06, 0x5B, 0x4F, 0x66, 0x6D, 0x7D, 0x07, 0x7F, 0x6F, 0x3F, 0x39, 0x0f, 0
+             -x70, 0x40, 0x80, 0x46};
+  12          #define Length 24
+  13          unsigned char show_length       = 20;  // ÏÔÊ¾³¤¶È
+  14          int show_mode                   = -1; // ÏÔÊ¾Ä£Ê½£¬0ÊÇÕı³£ÏÔÊ¾Ä£Ê½£¬1ÊÇĞŞ¸ÄÄ£Ê½  -1ÊÇÊäÈëÄ£Ê½
+  15          unsigned char Scintillation_bit = 0;  // ÉÁË¸Î»
+  16          bit Scintillation_flag          = 0;  // 0±íÊ¾ÉÁË¸Î»Ãğ£¬1±íÊ¾ÉÁË¸Î»ÁÁ
+  17          int answer;
+  18          // unsigned char Number[Length] = {10, 11, 12, 13, 14, 15, 16, 7, 8, 9, 1, 1, 2, 3, 4, 5,0,0,0,0,0,0,0,0};
+  19          unsigned char Number[Length] = {1, 2, 3, 15,11, 4, 2, 5, 14, 6, 2, 8, 16, 3, 2, 12, 14, 7, 8, 4};
+  20          // 123*(425-628/32)-784
+  21          sbit P2_2             = P2 ^ 2;
+  22          sbit P2_3             = P2 ^ 3;
+  23          sbit P2_4             = P2 ^ 4;
+  24          unsigned char Location = 0; // ÏÔÊ¾Î»ÖÃ
+  25          unsigned char Offset   = 0; // Æ«ÒÆÁ¿
+  26          unsigned char KeyNum;      // °´ÏÂµÄ°´¼ü
+  27          
+  28          void display(void) _task_ 0
+  29          {
+  30   1          os_create_task(1);
+  31   1          os_create_task(2);
+  32   1          os_create_task(3);
+  33   1          while (1) {
+  34   2              P0 = 0x00;
+  35   2              switch(Location)
+  36   2        {
+  37   3          case 0:P2_4=1;P2_3=1;P2_2=1;break;
+  38   3          case 1:P2_4=1;P2_3=1;P2_2=0;break;
+  39   3          case 2:P2_4=1;P2_3=0;P2_2=1;break;
+  40   3          case 3:P2_4=1;P2_3=0;P2_2=0;break;
+  41   3          case 4:P2_4=0;P2_3=1;P2_2=1;break;
+  42   3          case 5:P2_4=0;P2_3=1;P2_2=0;break;
+  43   3          case 6:P2_4=0;P2_3=0;P2_2=1;break;
+  44   3          case 7:P2_4=0;P2_3=0;P2_2=0;break;
+  45   3        }
+  46   2              if (!show_mode)
+  47   2                  P0 = NT[Number[Location + Offset]];
+  48   2              else if (show_mode) {
+  49   3                  if (Scintillation_bit != Location)
+  50   3                      P0 = NT[Number[Location + Offset]];
+  51   3                  else
+  52   3                      P0 = Scintillation_flag ? 0x00 : NT[Number[Location + Offset]];
+  53   3              } else if (show_mode == -1) {
+C51 COMPILER V9.60.7.0   LED                                                               05/23/2024 21:57:32 PAGE 2   
 
-  54   3                          P0 = NT[Number[Location]];
-  55   3                      }
-  56   2                      else{
-  57   3      
-  58   3                      }
-  59   2              Location++;
-  60   2              Location = Location % 8;
-  61   2              os_wait2(K_TMO,1);
-  62   2          }
-  63   1      }
-  64          int i=0;
-  65          void show_mode_change(void) _task_ 1
-  66          {
-  67   1          while (1)
-  68   1          {
-  69   2            if(show_mode==0)  //æ˜¾ç¤ºæ¨¡å¼ï¼Œæ¯æ¬¡åˆ·æ–°8ä¸ªä½ç½®
-  70   2            {
-  71   3                      if(show_length>=8)
-  72   3                      {
-  73   4                          Offset+=1;
-  74   4                  Offset%=(Length-8);
-  75   4                      }
-  76   3              for(i=0;i<=3;i++)
-  77   3                os_wait2(K_TMO, 700);
-  78   3            }
-  79   2            else if(show_mode==1||show_mode==-1)    //ä¿®æ”¹æ¨¡å¼ï¼Œæ¯æ¬¡ç¿»è½¬å½“å‰ä½æ•°ç ç®¡
-  80   2            {
-  81   3              Scintillation_flag=!Scintillation_flag;
-  82   3              for(i=0;i<=2;i++)
-  83   3                os_wait2(K_TMO, 430);
-  84   3            }
-  85   2          
-  86   2          }
-  87   1      }
-  88          void Task_3(void) _task_ 3
-  89          {
-  90   1      
-  91   1          while (1)
-  92   1          {
-  93   2            Key_Loop();
-  94   2            os_wait2(K_TMO, 70);
-  95   2          }
-  96   1      }
-  97          int count = 0;
-  98          void Task_2(void) _task_ 2
-  99          {
- 100   1          while (1)
- 101   1          {
- 102   2            KeyNum=Key();
- 103   2            if(KeyNum)
- 104   2            {
- 105   3                      if (KeyNum == Independent_button_1) {  //ç‹¬ç«‹æŒ‰é”®1
- 106   4                          if(show_mode==-1)
- 107   4                          {
- 108   5                              show_mode=0;
- 109   5                              Scintillation_bit=0;
- 110   5                              Offset=0;
- 111   5                          }
- 112   4                          else if (show_mode == 0||show_mode==1)
- 113   4                          {
- 114   5                              show_mode = !show_mode;
- 115   5                              Scintillation_bit=0;
-C51 COMPILER V9.60.7.0   LED                                                               05/22/2024 23:03:03 PAGE 3   
+  54   3                  P0 = NT[Number[Location]];
+  55   3              } else {
+  56   3              }
+  57   2              Location++;
+  58   2              Location = Location % 8;
+  59   2              os_wait2(K_TMO, 1);
+  60   2          }
+  61   1      }
+  62          int i = 0;
+  63          void show_mode_change(void) _task_ 1
+  64          {
+  65   1          while (1) {
+  66   2              if (show_mode == 0) // ÏÔÊ¾Ä£Ê½£¬Ã¿´ÎË¢ĞÂ8¸öÎ»ÖÃ
+  67   2              {
+  68   3                  if (show_length >= 8) {
+  69   4                      Offset += 1;
+  70   4                      Offset %= (show_length - 7);
+  71   4                  }
+  72   3                  for (i = 0; i <= 3; i++)
+  73   3                      os_wait2(K_TMO, 700);
+  74   3              } else if (show_mode == 1 || show_mode == -1) // ĞŞ¸ÄÄ£Ê½£¬Ã¿´Î·­×ªµ±Ç°Î»ÊıÂë¹Ü
+  75   2              {
+  76   3                  Scintillation_flag = !Scintillation_flag;
+  77   3                  for (i = 0; i <= 2; i++)
+  78   3                      os_wait2(K_TMO, 430);
+  79   3              }
+  80   2          }
+  81   1      }
+  82          
+  83          void Task_3(void) _task_ 3
+  84          {
+  85   1      
+  86   1          while (1) {
+  87   2              Key_Loop();
+  88   2              os_wait2(K_TMO, 70);
+  89   2          }
+  90   1      }
+  91          int count = 0;
+  92          void Task_2(void) _task_ 2
+  93          {
+  94   1          while (1) {
+  95   2              KeyNum = Key();
+  96   2              if (KeyNum) {
+  97   3                  if (KeyNum == Independent_button_1) { // ¶ÀÁ¢°´¼ü1
+  98   4                      if (show_mode == -1) {
+  99   5                          show_mode         = 0;
+ 100   5                          Scintillation_bit = 0;
+ 101   5                          Offset            = 0;
+ 102   5                      } else if (show_mode == 0 || show_mode == 1) {
+ 103   5                          show_mode         = !show_mode;
+ 104   5                          Scintillation_bit = 0;
+ 105   5                          Offset            = 0;
+ 106   5                          show_length       = 1;
+ 107   5                      }
+ 108   4                  } else if (KeyNum == Independent_button_2) { // ¶ÀÁ¢°´¼ü2
+ 109   4                      if (show_mode == 1) {
+ 110   5                          Scintillation_bit++;
+ 111   5                          if (Scintillation_bit > 8) {
+ 112   6                              Scintillation_bit = 8;
+ 113   6                              Offset++;
+ 114   6                          }
+ 115   5                      }
+C51 COMPILER V9.60.7.0   LED                                                               05/23/2024 21:57:32 PAGE 3   
 
- 116   5                              Offset=0;
- 117   5                              show_length=1;
- 118   5                          }
- 119   4                      }
- 120   3                      else if (KeyNum == Independent_button_2) {  //ç‹¬ç«‹æŒ‰é”®2
- 121   4                          if(show_mode==1)
- 122   4                          {
- 123   5                              Scintillation_bit++;
- 124   5                              if(Scintillation_bit> 8)
- 125   5                              {
- 126   6                                  Scintillation_bit = 8;
- 127   6                                  Offset++;
- 128   6                              }
- 129   5                          }
- 130   4                      }
- 131   3                      else if (KeyNum == Independent_button_3) {  //ç‹¬ç«‹æŒ‰é”®3
- 132   4                          show_mode = -1;
- 133   4                          for (count = 0; count < Length; count++) {
- 134   5                              Number[count] = 0;
- 135   5                          }
- 136   4                          Offset = 0;
- 137   4                          Scintillation_bit = 0;
- 138   4                      }
- 139   3                      else if (KeyNum == Independent_button_4) {  //ç‹¬ç«‹æŒ‰é”®4  
- 140   4      
- 141   4                      }
- 142   3                      else if(KeyNum<=16)
- 143   3                      {
- 144   4                          if(show_mode==1)
- 145   4                          {
- 146   5                              Number[Scintillation_bit+Offset]=KeyNum;
- 147   5                          }
- 148   4                          else if(show_mode==-1)
- 149   4                          {
- 150   5                              Number[Scintillation_bit + Offset] = KeyNum;
- 151   5                              Scintillation_bit++;
- 152   5                              show_length++;
- 153   5                              if (Scintillation_bit > 8) {
- 154   6                                  Scintillation_bit = 8;
- 155   6                                  Offset++;
- 156   6                              }
- 157   5                          }
- 158   4                      }
- 159   3      
- 160   3            }
- 161   2            os_wait2(K_TMO, 10);
- 162   2          }
- 163   1      }
+ 116   4                  } else if (KeyNum == Independent_button_3) { // ¶ÀÁ¢°´¼ü3
+ 117   4                      show_mode = -1;
+ 118   4                      for (count = 0; count < Length; count++) {
+ 119   5                          Number[count] = 0;
+ 120   5                      }
+ 121   4                      Offset            = 0;
+ 122   4                      Scintillation_bit = 0;
+ 123   4                  } else if (KeyNum == Independent_button_4) { // ¶ÀÁ¢°´¼ü4
+ 124   4                                                               // ¼ÆËã
+ 125   4      //                    answer=ans_calculate(Number);
+ 126   4      //                    for(count=0;count<Length;count++)
+ 127   4      //                    {
+ 128   4      //                        Number[count]=0;
+ 129   4      //                    }
+ 130   4      //                    count=0;
+ 131   4      //                    while (answer)
+ 132   4      //                    {
+ 133   4      //                        Number[count] = answer % 10;
+ 134   4      //                        answer /= 10;
+ 135   4      //                        count++;
+ 136   4      //                    }                   
+ 137   4                  } else if (KeyNum <= 16) {
+ 138   4                      if (show_mode == 1) {
+ 139   5                          Number[Scintillation_bit + Offset] = KeyNum;
+ 140   5                      } else if (show_mode == -1) {
+ 141   5                          Number[Scintillation_bit + Offset] = KeyNum;
+ 142   5                          Scintillation_bit++;
+ 143   5                          show_length++;
+ 144   5                          if (Scintillation_bit > 8) {
+ 145   6                              Scintillation_bit = 8;
+ 146   6                              Offset++;
+ 147   6                          }
+ 148   5                      }
+ 149   4                  }
+ 150   3              }
+ 151   2              os_wait2(K_TMO, 10);
+ 152   2          }
+ 153   1      }
 
 
 MODULE INFORMATION:   STATIC OVERLAYABLE
-   CODE SIZE        =    594    ----
-   CONSTANT SIZE    =   ----    ----
-   XDATA SIZE       =   ----    ----
+   CODE SIZE        =    748    ----
+   CONSTANT SIZE    =     17    ----
+   XDATA SIZE       =     37    ----
    PDATA SIZE       =   ----    ----
-   DATA SIZE        =     54    ----
+   DATA SIZE        =   ----    ----
    IDATA SIZE       =   ----    ----
    BIT SIZE         =      1    ----
 END OF MODULE INFORMATION.
